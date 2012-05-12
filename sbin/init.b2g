@@ -1,0 +1,6 @@
+#!/sbin/busybox sh
+
+mv /init /init.dualboot
+cp /innt /init
+cd /
+exec /init
