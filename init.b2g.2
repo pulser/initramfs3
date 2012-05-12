@@ -1,6 +1,8 @@
 on early-init
     start ueventd
-    import /init.b2g.rc
+    export TMPDIR /data/local/tmp
+    export LD_LIBRARY_PATH /vendor/lib:/system/lib:/system/b2g
+    export GRE_HOME /system/b2g
 
 # create mountpoints
     mkdir /mnt 0775 root system
@@ -902,6 +904,26 @@ service bugreport /system/bin/bugmailer.sh -v
 	disabled
 	oneshot
 	keycodes 114 115 116
+
+service fakeperm /system/bin/fakeperm
+    class b2g
+    user root
+
+service b2g /system/b2g/b2g
+    class b2g
+    user root
+    onrestart restart media
+
+service rilproxy /system/bin/rilproxy
+    class b2g
+    socket rilproxy stream 660 root system
+    socket rilproxyd stream 660 root system
+    user root
+    group radio
+
+service mount-sdcard /system/bin/mountvol.sh sdcard
+    class b2g
+    oneshot
 
 #boot2gecko start stuff
 start servicemanager-g

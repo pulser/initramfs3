@@ -55,7 +55,7 @@ AOSP=0
 MIUI=0
 B2G=0
 
-[ -d /system/b2g ] || B2G=1
+[ -d /system/b2g ] && B2G=1
 [ -f /system/framework/framework2.jar ] || AOSP=1
 [ "`/sbin/busybox grep Slim /system/build.prop`" ] && AOSP=1
 [ "`/sbin/busybox grep -i aosp /system/build.prop`" ] && AOSP=1
@@ -70,28 +70,29 @@ B2G=0
 [ -f /system/framework/framework-miui.jar ] && MIUI=1
 
 
-if ["$B2G" == 1 ];
+if [ "$B2G" == 1 ]
 then
-echo 1 > /proc/sys/kernel/rom_feature_set
-/sbin/busybox umount /system
+echo 0 > /proc/sys/kernel/rom_feature_set
+#busybox umount /system
+mv /init.b2g /init.rc
 exec /sbin/init.b2g
-fi;
+echo "Boot2Gecko Detected"
 
-
-if [ "$AOSP" == 1 ];
+elif [ "$AOSP" == 1 ]
 then
 echo 1 > /proc/sys/kernel/rom_feature_set
 /sbin/busybox umount /system
 exec /sbin/init.cm
-fi;
 
-if [ "$MIUI" == 1 ];
+
+elif [ "$MIUI" == 1 ]
 then
 mv /init.miui /init.rc
 mv /default.prop.miui /default.prop
-fi
 
+else
 rm -f /init.miui
 echo 0 > /proc/sys/kernel/rom_feature_set
 busybox umount /system
 exec /sbin/init.samsung
+fi
